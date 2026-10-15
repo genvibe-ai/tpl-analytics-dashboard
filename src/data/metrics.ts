@@ -11,6 +11,16 @@ import { NOW, daysAgo, monthsAgo, seeded } from './seed'
 const rand = seeded(7331)
 const noise = (spread: number) => (rand() - 0.5) * 2 * spread
 
+/**
+ * The KPI cards draw the last 20 points of a trend. Real metrics wobble month to month, so the
+ * displayed line gets a gentle seasonal swing on top of the underlying growth; the last two
+ * values (the KPI and its delta) are kept exact.
+ */
+const withSeason = (series: number[], amplitude: number) =>
+  series.map((v, i) =>
+    i >= series.length - 2 ? v : Math.round(v * (1 + amplitude * Math.sin(i * 1.15) + amplitude * 0.6 * Math.sin(i * 2.6 + 1))),
+  )
+
 /* ── MRR history: 25 months, oldest first, last = today ────────────── */
 
 export const mrrHistory: number[] = (() => {
@@ -40,15 +50,21 @@ export const signupWeeks: SignupWeek[] = Array.from({ length: 12 }, (_, i) => ({
 const netLast4Weeks = signupWeeks.slice(-4).reduce((sum, w) => sum + w.signups - w.churned, 0)
 
 const customerTrend: number[] = (() => {
-  const out = new Array<number>(12)
-  out[11] = payingCount
-  out[10] = payingCount - netLast4Weeks
-  for (let i = 9; i >= 0; i--) out[i] = Math.round(out[i + 1] / (1 + 0.036 + noise(0.008)))
-  return out
+  const out = new Array<number>(20)
+  out[19] = payingCount
+  out[18] = payingCount - netLast4Weeks
+  for (let i = 17; i >= 0; i--) out[i] = Math.round(out[i + 1] / (1 + 0.036 + noise(0.008)))
+  return withSeason(out, 0.03)
 })()
 
-const nrrTrend = [108.9, 109.6, 110.4, 111.2, 112.0, 112.6, 113.9, 114.8, 115.6, 116.4, 116.1, 118.2]
-const churnTrend = [2.9, 2.8, 2.7, 2.7, 2.6, 2.4, 2.4, 2.3, 2.2, 2.1, 2.3, 1.9]
+const nrrTrend = [
+  104.6, 106.1, 105.2, 107.4, 108.9, 107.8, 109.6, 111.2, 110.1, 112.0, 113.4, 112.6, 113.9, 115.7, 114.8,
+  115.6, 117.1, 116.4, 116.1, 118.2,
+]
+const churnTrend = [
+  3.6, 3.4, 3.7, 3.3, 3.1, 3.2, 2.9, 2.8, 3.0, 2.7, 2.6, 2.7, 2.4, 2.4, 2.5, 2.2, 2.3, 2.1, 2.3, 1.9,
+]
+
 
 const pctChange = (now: number, before: number) => ((now - before) / before) * 100
 const last = (list: number[]) => list[list.length - 1]
@@ -59,7 +75,7 @@ export const kpiValues = {
   mrr: {
     value: TARGET_MRR,
     delta: pctChange(TARGET_MRR, startingMrr),
-    trend: mrrHistory.slice(-12),
+    trend: withSeason(mrrHistory.slice(-20), 0.045),
   },
   nrr: {
     value: last(nrrTrend),
@@ -80,7 +96,7 @@ export const kpiValues = {
 
 /* ── Daily revenue (800 days, oldest first) ────────────────────────── */
 
-const WEEKDAY_FACTOR = [0.9, 1.03, 1.06, 1.05, 1.04, 1.01, 0.91] // Sun … Sat
+const WEEKDAY_FACTOR = [0.95, 1.02, 1.04, 1.03, 1.02, 1.0, 0.96] // Sun … Sat
 const DAYS = 800
 
 type Day = { date: string; value: number }
@@ -97,12 +113,12 @@ export const dailyRevenue: Day[] = (() => {
     const lo = Math.floor(position)
     const hi = Math.min(mrrHistory.length - 1, lo + 1)
     const mrr = mrrHistory[lo] + (mrrHistory[hi] - mrrHistory[lo]) * (position - lo)
-    const renewalBoost = date.getDate() === 1 ? 1.1 : 1
+    const renewalBoost = date.getDate() === 1 ? 1.06 : 1
     const value =
       (mrr / 30.44) *
       WEEKDAY_FACTOR[date.getDay()] *
       renewalBoost *
-      (0.95 + revRand() * 0.1)
+      (0.975 + revRand() * 0.05)
     out.push({ date: iso, value: Math.round(value) })
   }
   return out

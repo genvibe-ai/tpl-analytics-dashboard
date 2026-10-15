@@ -14,7 +14,8 @@ import { WorkspaceSwitcher } from './workspace-switcher'
 export function AppSidebar() {
   return (
     <Sidebar collapsible='icon' variant='inset'>
-      <SidebarHeader>
+      {/* 5px top padding puts the logo's centre on the top bar's centre line (37px from the top). */}
+      <SidebarHeader className='pt-[5px]'>
         <WorkspaceSwitcher />
       </SidebarHeader>
       <SidebarContent>

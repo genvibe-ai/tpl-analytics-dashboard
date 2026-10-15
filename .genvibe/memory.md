@@ -12,7 +12,7 @@ Revenue and product analytics dashboard for a fictional SaaS company ("Fernwick"
 - Shell: collapsible sidebar (⌘B), command menu (⌘K), notifications, workspace switcher, dark/light/system theme, sign-in (design only), 404/500. Works at 360px.
 
 ## Design
-- Dark by default; both palettes in `theme.colors` (content.ts): background #0B0D12, card #10131A, primary violet #7C5CFF, positive mint #34D399, negative #FB7185, warning #FBBF24, foreground #ECEEF3. Chart colours in `theme.charts`.
+- Dark by default; both palettes in `theme.colors` (content.ts): background #0B0D12, card #10131A, primary violet #7C5CFF, positive mint #34D399, negative #FB7185, warning #FBBF24, foreground #ECEEF3. Chart colours in `theme.charts`: `kpis` (one accent per KPI card: violet, mint, sky, rose), `plans` (indigo → fuchsia), `revenueEnd` (end of the revenue line's gradient).
 - Fonts: Sora (display, numbers) + Hanken Grotesk (UI), Fontsource; set in src/main.tsx and src/styles/theme.css.
 - Shape: 0.875rem radius cards, 1px borders, `shadow-card`/`shadow-float`/`shadow-glow`, 2px primary rail on active nav.
 - Motion: count-ups, chart draw-in (`useChartMotion`), `FadeIn` reveals, hover lift; `MotionConfig reducedMotion="user"` + CSS fallback.

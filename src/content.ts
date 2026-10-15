@@ -113,14 +113,18 @@ export const theme = {
   charts: {
     dark: {
       series: ['#7C5CFF', '#D95926', '#3987E5', '#D55181'],
-      plans: ['#4B37B8', '#6447E8', '#8A70FF', '#B5A6FF'],
+      plans: ['#4A5BE8', '#7C5CFF', '#A855F7', '#E879F9'],
+      kpis: ['#8B6CFF', '#34D399', '#38BDF8', '#FB7185'],
+      revenueEnd: '#E879F9',
       compare: '#6B7385',
       heatLow: '#151925',
       heatHigh: '#B5A6FF',
     },
     light: {
       series: ['#7C5CFF', '#EB6834', '#2A78D6', '#E87BA4'],
-      plans: ['#A08CFF', '#7C5CFF', '#5B3FE0', '#3F27A8'],
+      plans: ['#4F5BD5', '#7C5CFF', '#9333EA', '#C026D3'],
+      kpis: ['#6D4CFF', '#059669', '#0284C7', '#E11D48'],
+      revenueEnd: '#C026D3',
       compare: '#8C93A1',
       heatLow: '#F3F0FF',
       heatHigh: '#4B2FD0',

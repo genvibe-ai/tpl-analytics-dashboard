@@ -12,12 +12,15 @@ type SparklineProps = {
   className?: string
   /** Fill the area under the line with a soft wash. */
   area?: boolean
-  /** Show the end point. */
+  /** Show the end point (with a slow pulse). */
   dot?: boolean
   delay?: number
 }
 
-/** Small decorative trend line (values are always shown as text next to it). */
+/**
+ * Small decorative trend line (values are always shown as text next to it). The line fades in
+ * from the left, carries a soft glow of its own colour, and ends in a pulsing point.
+ */
 export function Sparkline({
   data,
   color = 'var(--chart-1)',
@@ -30,17 +33,19 @@ export function Sparkline({
   const [ref, width] = useElementWidth<HTMLDivElement>()
   const inView = useInView(ref, { once: true })
   const reduced = useReducedMotion()
-  const gradientId = useSvgId()
+  const id = useSvgId()
 
   const { line, fill, end } = useMemo(() => {
     if (width <= 0 || data.length < 2) return { line: '', fill: '', end: null }
-    const pad = dot ? 7 : 3
+    const padX = dot ? 8 : 3
+    const padTop = dot ? 10 : 4
+    const padBottom = dot ? 9 : 4
     const min = Math.min(...data)
     const max = Math.max(...data)
     const span = max - min || 1
     const points = data.map((v, i) => [
-      pad + (i / (data.length - 1)) * (width - pad * 2),
-      pad + (1 - (v - min) / span) * (height - pad * 2),
+      padX + (i / (data.length - 1)) * (width - padX * 2),
+      padTop + (1 - (v - min) / span) * (height - padTop - padBottom),
     ])
     // Smooth the line with a light Catmull-Rom → Bézier conversion.
     let d = `M${points[0][0]},${points[0][1]}`
@@ -59,50 +64,70 @@ export function Sparkline({
   }, [data, width, height, dot])
 
   const play = inView && !reduced
+  const draw = {
+    initial: reduced ? false : { pathLength: 0 },
+    animate: play || reduced ? { pathLength: 1 } : undefined,
+    transition: { duration: 1.2, delay, ease: [0.16, 1, 0.3, 1] as const },
+  }
 
   return (
     <div ref={ref} className={cn('w-full', className)} style={{ height }} aria-hidden='true'>
       {line && (
         <svg width={width} height={height} className='block overflow-visible'>
           <defs>
-            <linearGradient id={gradientId} x1='0' y1='0' x2='0' y2='1'>
-              <stop offset='0%' stopColor={color} stopOpacity={0.24} />
+            <linearGradient id={`${id}-fill`} x1='0' y1='0' x2='0' y2='1'>
+              <stop offset='0%' stopColor={color} stopOpacity={0.38} />
+              <stop offset='55%' stopColor={color} stopOpacity={0.1} />
               <stop offset='100%' stopColor={color} stopOpacity={0} />
             </linearGradient>
+            <linearGradient id={`${id}-stroke`} x1='0' y1='0' x2='1' y2='0'>
+              <stop offset='0%' stopColor={color} stopOpacity={0.3} />
+              <stop offset='55%' stopColor={color} stopOpacity={0.85} />
+              <stop offset='100%' stopColor={color} stopOpacity={1} />
+            </linearGradient>
+            <filter id={`${id}-glow`} x='-10%' y='-80%' width='120%' height='260%'>
+              <feGaussianBlur stdDeviation='4' />
+            </filter>
           </defs>
           {area && (
             <motion.path
               d={fill}
-              fill={`url(#${gradientId})`}
+              fill={`url(#${id}-fill)`}
               initial={reduced ? false : { opacity: 0 }}
               animate={play || reduced ? { opacity: 1 } : undefined}
-              transition={{ duration: 0.6, delay: delay + 0.5 }}
+              transition={{ duration: 0.7, delay: delay + 0.45 }}
             />
           )}
+          {/* Glow: the same curve, wider and blurred, under the crisp line. */}
           <motion.path
             d={line}
             fill='none'
             stroke={color}
-            strokeWidth={2}
+            strokeOpacity={0.55}
+            strokeWidth={5}
+            strokeLinecap='round'
+            filter={`url(#${id}-glow)`}
+            {...draw}
+          />
+          <motion.path
+            d={line}
+            fill='none'
+            stroke={`url(#${id}-stroke)`}
+            strokeWidth={2.25}
             strokeLinecap='round'
             strokeLinejoin='round'
-            initial={reduced ? false : { pathLength: 0 }}
-            animate={play || reduced ? { pathLength: 1 } : undefined}
-            transition={{ duration: 1.1, delay, ease: [0.16, 1, 0.3, 1] }}
+            {...draw}
           />
           {dot && end && (
-            <motion.circle
-              cx={end[0]}
-              cy={end[1]}
-              r={4}
-              fill={color}
-              stroke='var(--card)'
-              strokeWidth={2}
+            <motion.g
               initial={reduced ? false : { opacity: 0, scale: 0.4 }}
               animate={play || reduced ? { opacity: 1, scale: 1 } : undefined}
-              transition={{ duration: 0.35, delay: delay + 1 }}
+              transition={{ duration: 0.35, delay: delay + 1.05 }}
               style={{ transformOrigin: `${end[0]}px ${end[1]}px` }}
-            />
+            >
+              <circle className='spark-pulse' cx={end[0]} cy={end[1]} r={4} fill={color} />
+              <circle cx={end[0]} cy={end[1]} r={4} fill={color} stroke='var(--card)' strokeWidth={2} />
+            </motion.g>
           )}
         </svg>
       )}

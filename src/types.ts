@@ -33,8 +33,12 @@ export type Palette = {
 export type ChartPalette = {
   /** Categorical series, assigned in this fixed order (channels, segments…). */
   series: [string, string, string, string]
-  /** Ordered plan tiers, lowest → highest (one hue, light → dark on light, dim → bright on dark). */
+  /** Ordered plan tiers, lowest → highest (a cool → warm spectrum: indigo, violet, purple, fuchsia). */
   plans: [string, string, string, string]
+  /** One accent per KPI card on the Overview, in overview.kpis order (line, glow and icon tile). */
+  kpis: [string, string, string, string]
+  /** Where the revenue line's gradient ends (it starts at series[0]). */
+  revenueEnd: string
   /** De-emphasis line (previous period). */
   compare: string
   /** Heatmap ramp end points (cohort retention). */

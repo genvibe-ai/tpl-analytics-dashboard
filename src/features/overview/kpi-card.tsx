@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Info } from 'lucide-react'
 import { motion } from 'motion/react'
 import { common, data, overview } from '@/content'
@@ -17,14 +18,22 @@ export const kpiItemVariants = {
 export function KpiCard({ kpi, index }: { kpi: KpiDefinition; index: number }) {
   const metric = data.kpiValues[kpi.id]
   const Icon = kpi.icon
+  // Each card has its own accent (theme.charts.*.kpis in content.ts), used by the tile, glow and line.
+  const accent = `var(--kpi-${index + 1})`
   return (
     <motion.article
       variants={kpiItemVariants}
-      className='group relative flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-card transition-[border-color,transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-float'
+      style={{ '--kpi': accent } as CSSProperties}
+      className='group relative isolate flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-card transition-[border-color,transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-float'
     >
+      {/* A soft pool of the accent behind the trend line; brightens on hover. */}
+      <span
+        aria-hidden='true'
+        className='pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-28 bg-[radial-gradient(70%_100%_at_85%_100%,color-mix(in_oklab,var(--kpi)_22%,transparent),transparent_70%)] opacity-80 transition-opacity duration-300 group-hover:opacity-100'
+      />
       <div className='flex items-center justify-between gap-2 px-5 pt-4'>
         <h2 className='flex min-w-0 items-center gap-2 font-sans text-[13px] font-medium tracking-normal text-muted-foreground'>
-          <span className='grid size-7 shrink-0 place-items-center rounded-lg bg-primary/12 text-primary-text ring-1 ring-primary/15 ring-inset'>
+          <span className='grid size-7 shrink-0 place-items-center rounded-lg bg-[color-mix(in_oklab,var(--kpi)_16%,transparent)] text-(--kpi) ring-1 ring-[color-mix(in_oklab,var(--kpi)_28%,transparent)] ring-inset'>
             <Icon className='size-3.5' aria-hidden='true' />
           </span>
           <span className='line-clamp-2 leading-snug'>{kpi.label}</span>
@@ -57,7 +66,7 @@ export function KpiCard({ kpi, index }: { kpi: KpiDefinition; index: number }) {
         </div>
       </div>
       <div className='mt-auto pt-3'>
-        <Sparkline data={metric.trend} height={52} delay={0.3 + index * 0.08} />
+        <Sparkline data={metric.trend} color={accent} height={64} delay={0.3 + index * 0.08} />
       </div>
     </motion.article>
   )

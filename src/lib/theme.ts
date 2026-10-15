@@ -11,6 +11,8 @@ function variables(colors: Palette, charts: ChartPalette) {
   const lines = Object.entries(colors).map(([key, value]) => `--${kebab(key)}:${value};`)
   charts.series.forEach((value, i) => lines.push(`--chart-${i + 1}:${value};`))
   charts.plans.forEach((value, i) => lines.push(`--plan-${i + 1}:${value};`))
+  charts.kpis.forEach((value, i) => lines.push(`--kpi-${i + 1}:${value};`))
+  lines.push(`--chart-1-end:${charts.revenueEnd};`)
   lines.push(`--chart-compare:${charts.compare};`)
   return lines.join('')
 }

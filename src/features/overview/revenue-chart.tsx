@@ -30,7 +30,22 @@ export function RevenueChart({ className }: { className?: string }) {
   // Replays the draw-in when the range changes; resizes and theme switches draw instantly.
   const motionProps = useChartMotion(150, range)
   const gradientId = useSvgId()
+  const strokeId = useSvgId()
+  const glowId = useSvgId()
   const monthly = series.granularity === 'month'
+
+  // Round ticks that hug the data, so the curve fills the chart instead of riding on a $0 axis.
+  const yAxis = useMemo(() => {
+    const values = series.points.flatMap((p) => [p.value, p.previous])
+    const lo = Math.min(...values)
+    const hi = Math.max(...values)
+    const raw = (hi - lo) / 4 || 1
+    const magnitude = 10 ** Math.floor(Math.log10(raw))
+    const step = [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((s) => s >= raw) ?? raw
+    const ticks: number[] = []
+    for (let v = Math.floor(lo / step) * step; v <= Math.ceil(hi / step) * step + step / 2; v += step) ticks.push(v)
+    return { ticks, decimals: step >= 1000 ? 0 : step >= 100 ? 1 : 2 }
+  }, [series])
 
   const tickFormat = (iso: string) =>
     monthly ? formatDate(iso, 'month') : range === '7d' ? formatDate(iso, 'weekday') : formatDate(iso, 'day')
@@ -74,20 +89,29 @@ export function RevenueChart({ className }: { className?: string }) {
             <ComposedChart data={series.points} margin={{ top: 8, right: 6, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id={gradientId} x1='0' y1='0' x2='0' y2='1'>
-                  <stop offset='0%' stopColor='var(--chart-1)' stopOpacity={0.28} />
-                  <stop offset='70%' stopColor='var(--chart-1)' stopOpacity={0.06} />
+                  <stop offset='0%' stopColor='var(--chart-1)' stopOpacity={0.45} />
+                  <stop offset='45%' stopColor='var(--chart-1)' stopOpacity={0.16} />
                   <stop offset='100%' stopColor='var(--chart-1)' stopOpacity={0} />
                 </linearGradient>
+                <linearGradient id={strokeId} x1='0' y1='0' x2='1' y2='0'>
+                  <stop offset='0%' stopColor='var(--chart-1)' />
+                  <stop offset='100%' stopColor='var(--chart-1-end)' />
+                </linearGradient>
+                <filter id={glowId} x='-5%' y='-40%' width='110%' height='180%'>
+                  <feGaussianBlur stdDeviation='6' />
+                </filter>
               </defs>
-              <CartesianGrid vertical={false} stroke='var(--chart-grid)' />
+              <CartesianGrid vertical={false} stroke='var(--chart-grid)' strokeDasharray='3 6' />
               <XAxis dataKey='date' tickFormatter={tickFormat} minTickGap={28} {...axisProps} />
               <YAxis
                 width={52}
-                tickFormatter={(v: number) => formatCurrency(v, { compact: true, decimals: 0 })}
+                domain={[yAxis.ticks[0], yAxis.ticks[yAxis.ticks.length - 1]]}
+                ticks={yAxis.ticks}
+                tickFormatter={(v: number) => formatCurrency(v, { compact: true, decimals: yAxis.decimals })}
                 {...axisProps}
               />
               <Tooltip
-                cursor={{ stroke: 'var(--border-strong)', strokeWidth: 1 }}
+                cursor={{ stroke: 'var(--chart-1)', strokeOpacity: 0.45, strokeWidth: 1, strokeDasharray: '4 4' }}
                 content={(props) => {
                   const point = props.payload?.[0]?.payload as RevenuePoint | undefined
                   if (!props.active || !point) return null
@@ -108,18 +132,38 @@ export function RevenueChart({ className }: { className?: string }) {
                 type='monotone'
                 dataKey='previous'
                 stroke='var(--chart-compare)'
+                strokeOpacity={0.8}
                 strokeWidth={1.5}
+                strokeDasharray='5 5'
                 dot={false}
                 activeDot={false}
                 {...motionProps}
               />
-              <Area
+              <Area type='monotone' dataKey='value' stroke='none' fill={`url(#${gradientId})`} activeDot={false} {...motionProps} />
+              {/* Glow under the line: the same curve, wide and blurred. */}
+              <Line
                 type='monotone'
                 dataKey='value'
-                stroke='var(--chart-1)'
-                strokeWidth={2}
-                fill={`url(#${gradientId})`}
-                activeDot={{ r: 4.5, strokeWidth: 2, stroke: 'var(--card)', fill: 'var(--chart-1)' }}
+                stroke={`url(#${strokeId})`}
+                strokeOpacity={0.6}
+                strokeWidth={7}
+                filter={`url(#${glowId})`}
+                dot={false}
+                activeDot={false}
+                legendType='none'
+                tooltipType='none'
+                {...motionProps}
+              />
+              <Line
+                type='monotone'
+                dataKey='value'
+                stroke={`url(#${strokeId})`}
+                strokeWidth={2.5}
+                strokeLinecap='round'
+                dot={false}
+                activeDot={{ r: 5.5, strokeWidth: 3, stroke: 'var(--card)', fill: 'var(--chart-1-end)' }}
+                legendType='none'
+                tooltipType='none'
                 {...motionProps}
               />
             </ComposedChart>

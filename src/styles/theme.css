@@ -56,10 +56,15 @@
   --chart-2: #eb6834;
   --chart-3: #2a78d6;
   --chart-4: #e87ba4;
-  --plan-1: #a08cff;
+  --plan-1: #4f5bd5;
   --plan-2: #7c5cff;
-  --plan-3: #5b3fe0;
-  --plan-4: #3f27a8;
+  --plan-3: #9333ea;
+  --plan-4: #c026d3;
+  --kpi-1: #6d4cff;
+  --kpi-2: #059669;
+  --kpi-3: #0284c7;
+  --kpi-4: #e11d48;
+  --chart-1-end: #c026d3;
   --chart-compare: #8c93a1;
   --chart-grid: color-mix(in oklab, var(--foreground) 8%, transparent);
   --chart-axis: color-mix(in oklab, var(--foreground) 18%, transparent);
@@ -93,10 +98,15 @@
   --chart-2: #d95926;
   --chart-3: #3987e5;
   --chart-4: #d55181;
-  --plan-1: #4b37b8;
-  --plan-2: #6447e8;
-  --plan-3: #8a70ff;
-  --plan-4: #b5a6ff;
+  --plan-1: #4a5be8;
+  --plan-2: #7c5cff;
+  --plan-3: #a855f7;
+  --plan-4: #e879f9;
+  --kpi-1: #8b6cff;
+  --kpi-2: #34d399;
+  --kpi-3: #38bdf8;
+  --kpi-4: #fb7185;
+  --chart-1-end: #e879f9;
   --chart-compare: #6b7385;
   --chart-grid: color-mix(in oklab, var(--foreground) 7%, transparent);
 
@@ -185,5 +195,30 @@
   }
   to {
     background-position: -200% 0;
+  }
+}
+
+/* Sparkline end point: a soft ring that breathes out from the latest value. */
+@keyframes spark-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+
+.spark-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spark-pulse 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spark-pulse {
+    animation: none;
+    opacity: 0;
   }
 }

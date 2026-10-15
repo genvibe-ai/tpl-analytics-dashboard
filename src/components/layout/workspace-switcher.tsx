@@ -26,7 +26,10 @@ export function WorkspaceSwitcher() {
               size='lg'
               className='text-foreground data-[state=open]:bg-sidebar-accent'
             >
-              <LogoMark className='size-8' />
+              {/* Wrapped: the menu button shrinks direct svg children to 16px. */}
+              <span className='grid size-8 shrink-0 place-items-center'>
+                <LogoMark className='size-8' />
+              </span>
               <span className='grid flex-1 text-start leading-tight'>
                 <span className='truncate font-display text-[15px] font-semibold tracking-tight'>
                   {site.name}
