@@ -1,0 +1,189 @@
+/*
+ * Design tokens.
+ *
+ * The colours themselves live in src/content.ts (theme.colors.dark / theme.colors.light and
+ * theme.charts). src/lib/theme.ts writes them to the CSS variables below at startup, so editing
+ * content.ts recolours the whole app. The hex values here are only first-paint fallbacks.
+ *
+ * Tailwind names: bg-background bg-card bg-popover bg-muted bg-accent text-foreground
+ * text-muted-foreground border-border bg-primary text-primary-text bg-primary-fill
+ * text-positive text-negative text-warning bg-sidebar … (opacity works: bg-primary/10).
+ */
+:root {
+  --radius: 0.875rem;
+
+  --background: #f7f7fa;
+  --foreground: #0b0d12;
+  --sidebar: #efeff4;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #f1f1f5;
+  --muted-foreground: #5b6272;
+  --accent: #ededf3;
+  --border: #e4e4ec;
+  --input: #dcdce5;
+  --primary: #7c5cff;
+  --primary-foreground: #ffffff;
+  --positive: #047857;
+  --negative: #e11d48;
+  --warning: #b45309;
+  --destructive: #e11d48;
+
+  /* Derived roles (follow the base colours above, in both modes). */
+  --card-foreground: var(--foreground);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--accent);
+  --secondary-foreground: var(--foreground);
+  --accent-foreground: var(--foreground);
+  --ring: var(--primary);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  /* Light mode: selected sidebar items sit on white; dark mode uses the accent surface. */
+  --sidebar-accent: var(--card);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--primary);
+  --border-strong: color-mix(in oklab, var(--foreground) 16%, transparent);
+
+  /* AA-safe variants of the brand colour: button fills (white text) and violet text. */
+  --primary-fill: color-mix(in oklab, var(--primary) 86%, black);
+  --primary-fill-hover: color-mix(in oklab, var(--primary) 78%, black);
+  --primary-text: color-mix(in oklab, var(--primary) 82%, black);
+
+  /* Chart roles (see theme.charts in content.ts). */
+  --chart-1: #7c5cff;
+  --chart-2: #eb6834;
+  --chart-3: #2a78d6;
+  --chart-4: #e87ba4;
+  --plan-1: #a08cff;
+  --plan-2: #7c5cff;
+  --plan-3: #5b3fe0;
+  --plan-4: #3f27a8;
+  --chart-compare: #8c93a1;
+  --chart-grid: color-mix(in oklab, var(--foreground) 8%, transparent);
+  --chart-axis: color-mix(in oklab, var(--foreground) 18%, transparent);
+
+  --glow: color-mix(in oklab, var(--primary) 22%, transparent);
+}
+
+.dark {
+  --background: #0b0d12;
+  --foreground: #eceef3;
+  --sidebar: #08090d;
+  --card: #10131a;
+  --popover: #141821;
+  --muted: #161a23;
+  --muted-foreground: #8e97a8;
+  --accent: #1a1f2a;
+  --border: #1f2430;
+  --input: #272c38;
+  --primary: #7c5cff;
+  --primary-foreground: #ffffff;
+  --positive: #34d399;
+  --negative: #fb7185;
+  --warning: #fbbf24;
+  --destructive: #e11d48;
+
+  --primary-text: color-mix(in oklab, var(--primary) 64%, white);
+  --sidebar-accent: var(--accent);
+  --border-strong: color-mix(in oklab, var(--foreground) 14%, transparent);
+
+  --chart-1: #7c5cff;
+  --chart-2: #d95926;
+  --chart-3: #3987e5;
+  --chart-4: #d55181;
+  --plan-1: #4b37b8;
+  --plan-2: #6447e8;
+  --plan-3: #8a70ff;
+  --plan-4: #b5a6ff;
+  --chart-compare: #6b7385;
+  --chart-grid: color-mix(in oklab, var(--foreground) 7%, transparent);
+
+  --glow: color-mix(in oklab, var(--primary) 30%, transparent);
+}
+
+@theme inline {
+  --font-sans: 'Hanken Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Sora Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: calc(var(--radius) - 2px);
+  --radius-xl: var(--radius);
+  --radius-2xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-fill: var(--primary-fill);
+  --color-primary-fill-hover: var(--primary-fill-hover);
+  --color-primary-text: var(--primary-text);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-plan-1: var(--plan-1);
+  --color-plan-2: var(--plan-2);
+  --color-plan-3: var(--plan-3);
+  --color-plan-4: var(--plan-4);
+  --color-chart-compare: var(--chart-compare);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --shadow-card: 0 1px 0 0 color-mix(in oklab, var(--foreground) 4%, transparent) inset,
+    0 1px 2px 0 rgb(0 0 0 / 0.06);
+  --shadow-float: 0 18px 50px -20px rgb(0 0 0 / 0.45), 0 2px 6px -2px rgb(0 0 0 / 0.2);
+  --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent),
+    0 8px 28px -10px var(--glow);
+
+  --animate-pulse-ring: pulse-ring 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}

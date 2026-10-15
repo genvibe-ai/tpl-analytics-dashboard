@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+*.log
+.env*
+# review screenshots and scratch files (not part of the template)
+_shots
+_work
+
+# TanStack Router plugin temp files
+.tanstack
